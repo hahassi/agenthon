@@ -281,6 +281,8 @@
       padding: 40px 0;
     }
     #tags .mock { background: transparent; }
+    #tags .piece path { filter: url(#tag-puzzle-relief); }
+    #tags .piece:focus-visible path { filter: none; }
     .mock > * { min-width: 0; }
     .tag-group { grid-column: span 4; padding: 0 0 0 40px; }
     .tag-group:last-child { padding-right: 40px; }
@@ -455,6 +457,26 @@
   </style>
 </head>
 <body>
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+    <defs>
+      <filter id="tag-puzzle-relief" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="soft"/>
+        <feOffset in="soft" dx="-4" dy="-6" result="shade-offset"/>
+        <feComposite in="SourceAlpha" in2="shade-offset" operator="out" result="shade-edge"/>
+        <feFlood flood-color="#3A2B20" flood-opacity=".42" result="shade"/>
+        <feComposite in="shade" in2="shade-edge" operator="in" result="inner-shade"/>
+        <feOffset in="soft" dx="3" dy="4" result="light-offset"/>
+        <feComposite in="SourceAlpha" in2="light-offset" operator="out" result="light-edge"/>
+        <feFlood flood-color="#FFFFFF" flood-opacity=".72" result="light"/>
+        <feComposite in="light" in2="light-edge" operator="in" result="inner-light"/>
+        <feMerge>
+          <feMergeNode in="SourceGraphic"/>
+          <feMergeNode in="inner-shade"/>
+          <feMergeNode in="inner-light"/>
+        </feMerge>
+      </filter>
+    </defs>
+  </svg>
   <a class="skip" href="#chat">대화창으로 바로 가기</a>
 
   <header>
