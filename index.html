@@ -90,16 +90,16 @@
       row-gap: var(--gutter);
     }
     .intro {
-      grid-column: 1 / span 5;
+      grid-column: 1 / span 3;
       background: var(--lemon);
-      padding: 40px;
+      padding: clamp(20px, 2.1vw, 30px);
       display: flex; flex-direction: column;
       min-height: 0;
     }
     .eyebrow { font-size: 16px; font-weight: 700; letter-spacing: 0.02em; }
     .title {
       margin-top: 28px;
-      font-size: clamp(72px, 8.4vw, 136px);
+      font-size: clamp(42px, 5.2vw, 74px);
       font-weight: 900;
       line-height: 0.92;
       letter-spacing: -0.045em;
@@ -110,7 +110,7 @@
     .intro-more p { font-size: 16px; color: var(--ink-2); max-width: 26em; }
     .intro-more p + p { margin-top: 8px; }
     .hero-puzzle { margin-top: auto; padding-top: 32px; }
-    .hero-puzzle svg { display: block; width: 100%; max-width: 360px; height: auto; overflow: visible; }
+    .hero-puzzle svg { display: block; width: 100%; max-width: 220px; height: auto; overflow: visible; }
 
     .assemble path {
       animation: assemble .9s cubic-bezier(.2,.7,.2,1) both;
@@ -124,7 +124,7 @@
 
     /* ---------- Chat panel ---------- */
     .chat {
-      grid-column: 6 / span 7;
+      grid-column: 4 / span 9;
       background: var(--white);
       display: flex; flex-direction: column;
       min-height: 0;
@@ -311,7 +311,8 @@
     /* ---------- Tablet ---------- */
     @media (max-width: 1080px) {
       :root { --margin: 24px; --gutter: 16px; }
-      .intro { padding: 32px; }
+      .intro { grid-column: 1 / span 4; padding: 24px; }
+      .chat { grid-column: 5 / span 8; }
       .flow-step { grid-column: span 6; min-height: 220px; }
       .tag-group { grid-column: 1 / -1; padding: 0 32px; }
       .tag-group:last-child { padding-right: 32px; }
@@ -400,7 +401,7 @@
     <!-- ===== 첫 화면: 소개(5열) + 실제 대화창(7열) ===== -->
     <section class="grid hero" aria-label="조각연습실 소개와 대화">
       <div class="intro">
-        <p class="eyebrow">디자인 연습 에이전트</p>
+        <p class="eyebrow">AI Agent</p>
         <h1 class="title">조각<br>연습실</h1>
         <p class="lede">좋아하는 디자인에서 한 조각을 골라 직접 만들어 봐요.</p>
         <details class="intro-more" open>
