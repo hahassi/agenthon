@@ -420,7 +420,38 @@
     #history-content { display: grid; gap: 8px; }
     #history-content p { margin: 0; padding: 8px 12px; background: var(--paper-h); white-space: pre-wrap; overflow-wrap: anywhere; }
     #history-content p[data-user="true"] { background: var(--lavender); }
-</style>
+    .welcome.is-opening {
+      position: fixed; inset: 0; z-index: 50;
+      display: flex; flex-direction: column; align-items: stretch;
+      justify-content: safe center; padding: clamp(20px, 7vw, 104px);
+    }
+    .welcome.is-opening h2 { font-size: clamp(52px, 11vw, 136px); }
+    .welcome.is-opening .welcome-roles li { padding: clamp(12px, 3vw, 40px); }
+    .welcome.is-opening .welcome-roles strong { font-size: clamp(22px, 4vw, 52px); }
+    .welcome.is-opening .btn { align-self: flex-start; }
+    .opening-logo { display: none; }
+    .is-opening .opening-logo {
+      position: absolute; inset: 0; z-index: 1;
+      display: grid; place-items: center; background: var(--bg);
+      pointer-events: none; animation: opening-logo 1.5s ease both;
+    }
+    .opening-logo .brand-logo { width: min(68vw, 660px); }
+    .is-opening > :is(h2, p), .is-opening .welcome-roles li {
+      animation: opening-card .55s ease both;
+      animation-delay: 1.45s;
+    }
+    .is-opening .welcome-roles li:nth-child(2) { animation-delay: 1.65s; }
+    .is-opening .welcome-roles li:nth-child(3) { animation-delay: 1.85s; }
+    @keyframes opening-logo {
+      0% { opacity: 0; transform: scale(.94); }
+      25%, 72% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.04); visibility: hidden; }
+    }
+    @keyframes opening-card {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
   <a class="skip" href="#chat">대화창으로 바로 가기</a>
@@ -432,7 +463,7 @@
       </a>
       <nav class="nav" aria-label="페이지 내 이동">
         <a href="#chat">Chat</a>
-        <a href="#flow">Flow</a>
+        <a href="#welcome">Flow</a>
         <a href="#tags">Tag</a>
         <a href="#pieces">Board</a>
       </nav>
@@ -458,7 +489,7 @@
 
       <div class="chat" id="chat" data-view="welcome" role="region" aria-labelledby="welcome-title">
         <section class="welcome" id="welcome" aria-labelledby="welcome-title">
-          <h2 id="welcome-title">어떻게 연습하나요?</h2>
+          <div class="opening-logo" aria-hidden="true"><span class="brand-logo"></span></div><h2 id="welcome-title">Flow</h2>
           <p>레퍼런스에서 눈에 들어온 요소 하나를 따라 만들고, 내 작업에 적용해 봐요.</p>
           <ul class="welcome-roles">
             <li class="c-lavender"><strong>관찰</strong><p>작품에서 볼 부분과 연습할 조각을 골라요.</p></li>
@@ -466,7 +497,7 @@
             <li class="c-mint"><strong>기록</strong><p>바꾼 설정과 전후 결과를 정리해요.</p></li>
           </ul>
           <p>피그마, 포토샵, 일러스트레이터 중 쓰는 도구와 배우고 싶은 표현을 알려 주세요. 참고 이미지가 있으면 함께 올려도 좋아요.</p>
-          <button class="btn" id="start-chat" type="button">대화 시작하기</button>
+          <button class="btn" id="start-chat" type="button">바로 대화하기</button>
         </section>
         <div class="chat-bar">
           <h2 id="chat-title" tabindex="-1" aria-label="조각연습실 대화"><span class="brand-logo" aria-hidden="true"></span></h2>
@@ -496,19 +527,6 @@
           </div>
         </div>
         <p class="sr-only" id="status" role="status" aria-live="polite"></p>
-      </div>
-    </section>
-
-    <!-- ===== 사용 흐름 ===== -->
-    <section class="block" id="flow" aria-labelledby="flow-title">
-      <div class="grid">
-        <div class="section-head">
-          <h2 id="flow-title">사용 흐름</h2>
-        </div>
-        <article class="flow-step c-lemon"><span class="num">01</span><h3>태그</h3><p>배우고 싶은 표현에 맞는 연습 주제를 골라요.</p></article>
-        <article class="flow-step c-lavender"><span class="num">02</span><h3>레퍼런스</h3><p>작품에서 어디를 볼지 확인해요.</p></article>
-        <article class="flow-step c-mint"><span class="num">03</span><h3>실습</h3><p>한 요소를 따라 만든 뒤 내 소재와 문구에 적용해요.</p></article>
-        <article class="flow-step c-paper"><span class="num">04</span><h3>기록</h3><p>바꾼 설정과 결과를 비교해 다음 연습에 남겨요.</p></article>
       </div>
     </section>
 
@@ -1110,19 +1128,43 @@
     document.getElementById("new-chat").addEventListener("click", connect);
     document.getElementById("retry").addEventListener("click", connect);
     const chatPanel = document.getElementById("chat");
-    function openChat() {
-      if (chatPanel.dataset.view !== "welcome") return;
-      chatPanel.dataset.view = "chat";
-      document.getElementById("welcome").hidden = true;
-      chatPanel.setAttribute("aria-labelledby", "chat-title");
-      document.getElementById("chat-title").focus({ preventScroll: true });
-      connect();
+    const welcome = document.getElementById("welcome");
+    let openingTimer;
+    function openChat(focusTitle = false) {
+      clearTimeout(openingTimer);
+      welcome.classList.remove("is-opening");
+      welcome.hidden = true;
+      if (chatPanel.dataset.view === "welcome") {
+        chatPanel.dataset.view = "chat";
+        chatPanel.setAttribute("aria-labelledby", "chat-title");
+        connect();
+      }
+      if (focusTitle) document.getElementById("chat-title").focus({ preventScroll: true });
     }
-
-    document.getElementById("start-chat").addEventListener("click", openChat);
+    function playOpening() {
+      clearTimeout(openingTimer);
+      welcome.hidden = false;
+      welcome.classList.remove("is-opening");
+      void welcome.offsetWidth;
+      welcome.classList.add("is-opening");
+      const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduced) welcome.querySelector(".opening-logo").hidden = true;
+      openingTimer = setTimeout(openChat, reduced ? 3800 : 5200);
+    }
+    document.getElementById("start-chat").addEventListener("click", () => openChat(true));
     document.querySelectorAll('a[href="#chat"]').forEach(link => {
-      link.addEventListener("click", openChat);
+      link.addEventListener("click", () => openChat(true));
     });
+    document.querySelector('a[href="#welcome"]').addEventListener("click", event => {
+      event.preventDefault();
+      playOpening();
+      document.getElementById("start-chat").focus({ preventScroll: true });
+    });
+    if (location.hash && location.hash !== "#flow" && location.hash !== "#welcome") {
+      openChat();
+    } else {
+      playOpening();
+    }
   })();
   </script>
 </body>
