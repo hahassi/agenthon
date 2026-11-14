@@ -6,21 +6,22 @@
   <title>조각연습실 — 디자인 한 조각씩 직접 만들어 보는 연습</title>
   <meta name="description" content="좋아하는 디자인에서 한 조각을 골라 직접 만들어 봐요.">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Galmuri11/subsets/Galmuri11-dynamic-subset.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;family=VT323&amp;display=swap">
   <style>
     :root {
-      --lemon: #F2E14C;
-      --lemon-h: #F7EC86;
-      --lavender: #C9B8F0;
-      --lavender-h: #DACCF6;
-      --mint: #A8E2C8;
-      --mint-h: #C3ECD9;
-      --paper: #ECE5D3;
-      --paper-h: #F4EFE2;
-      --bg: #FBFAF5;
-      --white: #FFFFFF;
-      --ink: #151515;
-      --ink-2: #4A4A46;
+      --lemon: #FFF9CF;
+      --lemon-h: #FFFBEA;
+      --lavender: #EEDAE6;
+      --lavender-h: #FFFBEA;
+      --mint: #F1F1C1;
+      --mint-h: #FFFBEA;
+      --paper: #C2E9FF;
+      --paper-h: #FFFBEA;
+      --bg: #FFFBEA;
+      --white: #FFFBEA;
+      --ink: #3A2B20;
+      --ink-2: #3A2B20;
       --error: #B3261E;
       --font: "Pretendard Variable", Pretendard, "SUIT Variable", SUIT, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
       --gutter: 24px;
@@ -158,7 +159,7 @@
       background: var(--ink); color: var(--white);
       transition: background-color .15s, color .15s;
     }
-    .btn:hover { background: #3A3A37; }
+    .btn:hover { background: #533E30; }
     .btn--light { background: var(--white); color: var(--ink); }
     .btn--light:hover { background: var(--paper-h); }
     .chat-bar .btn { margin-left: auto; }
@@ -376,7 +377,40 @@
     #history-content { display: grid; gap: 8px; }
     #history-content p { margin: 0; padding: 8px 12px; background: var(--paper-h); white-space: pre-wrap; overflow-wrap: anywhere; }
     #history-content p[data-user="true"] { background: var(--lavender); }
-</style>
+    /* Retro Windows — typography, palette and beveled controls */
+    :root {
+      --retro-navy: #3A2B20;
+      --retro-blue: #C2E9FF;
+      --retro-display: "Press Start 2P", Galmuri11, "Malgun Gothic", sans-serif;
+      --retro-raised: inset 2px 2px #fff, inset -2px -2px #3A2B20, inset -4px -4px #AA9581;
+      --retro-inset: inset 2px 2px #AA9581, inset -2px -2px #fff;
+    }
+    .title, .section-head h2 { font-family: var(--retro-display); }
+    .eyebrow, .flow-step .num { font-family: VT323, Galmuri11, monospace; }
+    .intro, .chat, .mock, .flow-step, .chat-history { box-shadow: var(--retro-raised); }
+    .chat-bar { background: var(--retro-navy); color: var(--white); }
+    .conn { background: var(--paper-h); color: var(--ink); }
+    .btn, .prompt, .nav a, .ref, #history-list button, #webchat .ac-pushButton {
+      background-color: var(--paper); color: var(--ink);
+      box-shadow: var(--retro-raised); border-radius: 0;
+    }
+    .btn:hover, .btn--light:hover, .prompt:not([aria-disabled="true"]):hover,
+    .nav a:hover, .ref:hover { background-color: var(--paper-h); color: var(--retro-navy); }
+    .btn:active, .prompt:not([aria-disabled="true"]):active, .nav a:active,
+    .ref[aria-pressed="true"], #history-list button[aria-pressed="true"] {
+      box-shadow: var(--retro-inset);
+    }
+    .chat-body, .ref-img { box-shadow: var(--retro-inset); }
+    .badge, .skip { background: var(--retro-navy); color: var(--white); }
+    .piece[aria-pressed="true"] path, .piece[aria-current="true"] path { fill: var(--retro-navy); }
+    .section-head h2, .stage-head h3 { color: var(--retro-navy); }
+    :focus-visible { outline-color: var(--retro-navy); }
+    .chat-bar :focus-visible { outline-color: var(--white); }
+    @media (max-width: 760px) {
+      .chat-controls { min-width: 0; }
+      .chat-bar { flex-wrap: wrap; }
+    }
+  </style>
 </head>
 <body>
   <a class="skip" href="#chat">대화창으로 바로 가기</a>
@@ -509,11 +543,6 @@
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="grid">
-      <p>조각연습실 · 대화는 Copilot Studio 에이전트와 연결되어 있어요. 태그 판과 조각 보드는 화면 시안이에요.</p>
-    </div>
-  </footer>
 
   <dialog class="chat-history" id="history-dialog" aria-labelledby="history-title">
     <div class="history-heading">
@@ -586,7 +615,7 @@
 
     // hero: 3x2 pieces assembling once
     const hero = document.getElementById("hero-svg");
-    const heroColors = ["#151515", "var(--lavender)", "var(--mint)", "var(--white)", "var(--paper)", "var(--lavender)"];
+    const heroColors = ["var(--lemon)", "var(--lavender)", "var(--mint)", "var(--paper)", "var(--mint)", "var(--lavender)"];
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!reduce) hero.classList.add("assemble");
     jigsaw(3, 2, 120).forEach((p, i) => {
@@ -751,8 +780,8 @@
         next: "부제를 제목 아래 4열 너비에 맞춰 보기" },
       { name: "보색\n대비", tool: "Photoshop",
         before: bars(R(14,24,80,22,"#E6E6E6")+R(14,120,50,6,"#E6E6E6"), "#8FA3B8"),
-        after: bars(R(14,24,80,22,"#F2E14C")+R(14,120,50,6,"#F2E14C"), "#2B3FD9"),
-        settings: [["배경색", "#8FA3B8 → #2B3FD9"], ["제목색", "#E6E6E6 → #F2E14C"], ["채도", "+35"]],
+        after: bars(R(14,24,80,22,"#D4D0C8")+R(14,120,50,6,"#D4D0C8"), "#2B3FD9"),
+        settings: [["배경색", "#8FA3B8 → #2B3FD9"], ["제목색", "#E6E6E6 → #D4D0C8"], ["채도", "+35"]],
         next: "보색 면적을 7:3으로 줄여 보기" },
       { name: "겹침", tool: "Photoshop",
         before: bars(R(30,30,60,70,"#A8A8A0")+R(14,116,92,18), "#FFFFFF"),
@@ -760,18 +789,18 @@
         settings: [["레이어 순서", "글자 위 → 글자 일부 사진 뒤"], ["마스크", "없음 → 사진 윤곽"]],
         next: "겹친 뒤에도 제목이 읽히는지 작은 화면에서 확인하기" },
       { name: "그리드\n정렬", tool: "Figma",
-        before: bars(R(10,20,60,14)+R(24,48,70,6)+R(18,62,50,6)+R(36,110,60,30,"#C9B8F0"), "#FFFFFF"),
-        after: bars(R(12,20,60,14)+R(12,48,70,6)+R(12,62,50,6)+R(12,110,96,30,"#C9B8F0"), "#FFFFFF"),
+        before: bars(R(10,20,60,14)+R(24,48,70,6)+R(18,62,50,6)+R(36,110,60,30,"#B7D6ED"), "#FFFFFF"),
+        after: bars(R(12,20,60,14)+R(12,48,70,6)+R(12,62,50,6)+R(12,110,96,30,"#B7D6ED"), "#FFFFFF"),
         settings: [["레이아웃 그리드", "없음 → 12열, 간격 24px"], ["시작선", "4곳 → 1곳"]],
         next: "이미지 오른쪽 끝도 열 경계에 맞추기" },
       { name: "단색\n블록", tool: "Figma",
         before: bars(R(0,0,60,80,"#E7A1A1")+R(60,0,60,80,"#9FC3E7")+R(0,80,60,80,"#E7D59F")+R(60,80,60,80,"#B7E79F"), "#FFFFFF"),
-        after: bars(R(0,0,120,80,"#F2E14C")+R(0,80,72,80,"#C9B8F0")+R(72,80,48,80,"#A8E2C8")+R(10,20,80,18), "#FFFFFF"),
+        after: bars(R(0,0,120,80,"#D4D0C8")+R(0,80,72,80,"#B7D6ED")+R(72,80,48,80,"#C7D3DB")+R(10,20,80,18), "#FFFFFF"),
         settings: [["색 수", "4 → 3"], ["블록 면적 비율", "1:1:1:1 → 5:3:2"]],
         next: "가장 작은 블록에 날짜 정보 담기" },
       { name: "질감", tool: "Photoshop",
-        before: bars(R(14,24,80,20), "#ECE5D3"),
-        after: bars('<filter id="nz"><feTurbulence baseFrequency=".9" numOctaves="2"/><feColorMatrix values="0 0 0 0 .08 0 0 0 0 .08 0 0 0 0 .08 0 0 0 .35 0"/></filter><rect width="120" height="160" filter="url(#nz)"/>' + R(14,24,80,20), "#ECE5D3"),
+        before: bars(R(14,24,80,20), "#C0C0C0"),
+        after: bars('<filter id="nz"><feTurbulence baseFrequency=".9" numOctaves="2"/><feColorMatrix values="0 0 0 0 .08 0 0 0 0 .08 0 0 0 0 .08 0 0 0 .35 0"/></filter><rect width="120" height="160" filter="url(#nz)"/>' + R(14,24,80,20), "#C0C0C0"),
         settings: [["노이즈", "0% → 6%"], ["혼합 모드", "표준 → 곱하기"], ["적용 범위", "배경만"]],
         next: "질감 대신 망점 패턴으로 바꿔 비교하기" }
     ];
@@ -872,36 +901,36 @@
     const styleOptions = {
       rootHeight: "100%",
       primaryFont: getComputedStyle(document.documentElement).getPropertyValue("--font").trim(),
-      accent: "#151515",
-      backgroundColor: "#FFFFFF",
-      bubbleBackground: "#F4EFE2",
+      accent: "#3A2B20",
+      backgroundColor: "#FFFBEA",
+      bubbleBackground: "#FFF9CF",
       bubbleBorderWidth: 0,
       bubbleBorderRadius: 0,
-      bubbleTextColor: "#151515",
-      bubbleFromUserBackground: "#C9B8F0",
+      bubbleTextColor: "#3A2B20",
+      bubbleFromUserBackground: "#C2E9FF",
       bubbleFromUserBorderWidth: 0,
       bubbleFromUserBorderRadius: 0,
-      bubbleFromUserTextColor: "#151515",
+      bubbleFromUserTextColor: "#3A2B20",
       bubbleMaxWidth: 640,
       botAvatarInitials: "조각",
-      botAvatarBackgroundColor: "#F2E14C",
+      botAvatarBackgroundColor: "#EEDAE6",
       userAvatarInitials: "나",
-      userAvatarBackgroundColor: "#A8E2C8",
+      userAvatarBackgroundColor: "#F1F1C1",
       hideUploadButton: false,
-      sendBoxBackground: "#FFFFFF",
-      sendBoxTextColor: "#151515",
-      sendBoxButtonColor: "#151515",
-      sendBoxButtonColorOnHover: "#151515",
-      sendBoxButtonShadeColorOnHover: "#F2E14C",
-      sendBoxBorderTop: "solid 2px #ECE5D3",
+      sendBoxBackground: "#FFFBEA",
+      sendBoxTextColor: "#3A2B20",
+      sendBoxButtonColor: "#3A2B20",
+      sendBoxButtonColorOnHover: "#3A2B20",
+      sendBoxButtonShadeColorOnHover: "#FFF9CF",
+      sendBoxBorderTop: "solid 2px #EEDAE6",
       sendBoxHeight: 56,
       suggestedActionLayout: "flow",
-      suggestedActionBackgroundColor: "#FFFFFF",
-      suggestedActionBackgroundColorOnHover: "#F2E14C",
-      suggestedActionBorderColor: "#151515",
+      suggestedActionBackgroundColor: "#FFFBEA",
+      suggestedActionBackgroundColorOnHover: "#FFF9CF",
+      suggestedActionBorderColor: "#3A2B20",
       suggestedActionBorderRadius: 0,
-      suggestedActionTextColor: "#151515",
-      transcriptVisualKeyboardIndicatorColor: "#151515"
+      suggestedActionTextColor: "#3A2B20",
+      transcriptVisualKeyboardIndicatorColor: "#3A2B20"
     };
 
     const historyKey = "jogak-chat-history-v1";
