@@ -366,7 +366,17 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation: none !important; transition: none !important; }
     }
-  </style>
+      .chat-controls { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chat-history { width: min(720px, calc(100% - 32px)); max-height: 80vh; overflow: auto; border: 0; padding: 24px; background: var(--bg); color: var(--ink); }
+    .chat-history::backdrop { background: rgb(21 21 21 / 45%); }
+    .history-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    #history-list { display: grid; gap: 6px; margin: 16px 0; }
+    #history-list button { text-align: left; padding: 8px 12px; border: 0; background: var(--paper); cursor: pointer; overflow-wrap: anywhere; }
+    #history-list button[aria-pressed="true"] { background: var(--lavender); }
+    #history-content { display: grid; gap: 8px; }
+    #history-content p { margin: 0; padding: 8px 12px; background: var(--paper-h); white-space: pre-wrap; overflow-wrap: anywhere; }
+    #history-content p[data-user="true"] { background: var(--lavender); }
+</style>
 </head>
 <body>
   <a class="skip" href="#chat">대화창으로 바로 가기</a>
@@ -407,7 +417,7 @@
         <div class="chat-bar">
           <h2 id="chat-title">조각연습실</h2>
           <span class="conn" id="conn" data-state="connecting">연결 중</span>
-          <button class="btn btn--light" id="new-chat" type="button">새 대화</button>
+          <div class="chat-controls"><button class="btn btn--light" id="open-history" type="button">이전 대화</button><button class="btn btn--light" id="new-chat" type="button">새 대화</button></div>
         </div>
         <div class="prompts" role="group" aria-label="추천 프롬프트">
           <p class="prompts-label">눌러서 입력창에 채운 뒤, 직접 보내 주세요.</p>
@@ -505,6 +515,15 @@
     </div>
   </footer>
 
+  <dialog class="chat-history" id="history-dialog" aria-labelledby="history-title">
+    <div class="history-heading">
+      <h2 id="history-title">이전 대화</h2>
+      <form method="dialog"><button class="btn btn--light">닫기</button></form>
+    </div>
+    <small>이 브라우저에 저장된 메시지를 다시 읽을 수 있어요.</small>
+    <div id="history-list" aria-label="대화 목록"></div>
+    <div id="history-content" aria-label="대화 내용" aria-live="polite"></div>
+  </dialog>
   <script src="https://cdn.botframework.com/botframework-webchat/4.18.0/webchat.js"></script>
   <script>
   /* =====================================================================
@@ -885,7 +904,58 @@
       transcriptVisualKeyboardIndicatorColor: "#151515"
     };
 
+    const historyKey = "jogak-chat-history-v1";
+    let history = [];
+    try {
+      const saved = JSON.parse(localStorage.getItem(historyKey) || "[]");
+      if (Array.isArray(saved)) history = saved;
+    } catch {}
+    let session = null;
+
+    function remember(activity) {
+      if (activity?.type !== "message" || typeof activity.text !== "string" || !activity.text.trim()) return;
+      const user = activity.from?.role === "user";
+      if (!session && !user) return;
+      if (!session) {
+        session = { title: activity.text.trim().slice(0, 80), date: Date.now(), messages: [] };
+        history.unshift(session);
+        history = history.slice(0, 20);
+      }
+      if (activity.id && session.messages.some(message => message.id === activity.id)) return;
+      session.messages.push({ id: activity.id, user, text: activity.text.slice(0, 6000) });
+      session.messages = session.messages.slice(-60);
+      try { localStorage.setItem(historyKey, JSON.stringify(history)); } catch {}
+    }
+
+    const historyDialog = document.getElementById("history-dialog");
+    const historyList = document.getElementById("history-list");
+    const historyContent = document.getElementById("history-content");
+    document.getElementById("open-history").addEventListener("click", () => {
+      historyList.replaceChildren();
+      historyContent.replaceChildren();
+      if (!history.length) historyList.textContent = "아직 저장된 대화가 없어요.";
+      history.forEach((entry, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = new Date(entry.date).toLocaleDateString("ko-KR") + " · " + entry.title;
+        button.setAttribute("aria-pressed", "false");
+        button.addEventListener("click", () => {
+          [...historyList.children].forEach(item => item.setAttribute("aria-pressed", String(item === button)));
+          historyContent.replaceChildren(...entry.messages.map(message => {
+            const line = document.createElement("p");
+            line.dataset.user = String(message.user);
+            line.textContent = (message.user ? "나 · " : "조각연습실 · ") + message.text;
+            return line;
+          }));
+        });
+        historyList.append(button);
+        if (index === 0) button.click();
+      });
+      historyDialog.showModal();
+    });
+
     async function connect() {
+      session = null;
       const gen = ++generation;
       teardown();
       errBox.hidden = true;
@@ -945,6 +1015,7 @@
         store = WebChat.createStore({}, () => (next) => (action) => {
           if (gen === generation) {
             const a = action.payload && action.payload.activity;
+            if (action.type === "DIRECT_LINE/INCOMING_ACTIVITY") remember(a);
             if (action.type === "DIRECT_LINE/POST_ACTIVITY" && a && a.type === "message") {
               startWaiting();
             } else if (action.type === "DIRECT_LINE/INCOMING_ACTIVITY" && a && a.type === "message" &&
