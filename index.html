@@ -179,6 +179,21 @@
     .prompt[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
     .prompt[aria-disabled="true"]:hover { background: var(--white); }
 
+    .reply-wait {
+      position: absolute; left: 16px; right: 16px; bottom: 64px; z-index: 2;
+      width: fit-content; max-width: calc(100% - 32px);
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px; background: var(--paper-h); color: var(--ink);
+      border: 1px solid var(--lavender); font-size: .875rem;
+      pointer-events: none;
+    }
+    .reply-spinner {
+      width: 16px; height: 16px; flex: none; border: 2px solid var(--lavender);
+      border-top-color: var(--ink); border-radius: 50%;
+      animation: reply-spin .8s linear infinite;
+    }
+    @keyframes reply-spin { to { transform: rotate(360deg); } }
+
     .chat-body { position: relative; flex: 1; min-height: 0; display: flex; }
     #webchat { position: absolute; inset: 0; }
     .chat-loading, .chat-error {
@@ -428,6 +443,10 @@
         </div>
         <div class="chat-body">
           <div id="webchat" role="main" aria-label="조각연습실 대화"></div>
+          <div class="reply-wait" id="reply-wait" role="status" hidden>
+            <span class="reply-spinner" aria-hidden="true"></span>
+            <span>답변을 준비하고 있어요. 잠시만 기다려 주세요.</span>
+          </div>
           <div class="chat-loading" id="chat-loading">
             <p>조각연습실에 연결하는 중이에요…</p>
           </div>
@@ -839,6 +858,7 @@
       setPrompts(false);
     }
     function startWaiting() {
+      document.getElementById("reply-wait").hidden = false;
       waiting = true;
       setConn("waiting", "답변을 준비하고 있어요");
       clearTimeout(waitTimer);
@@ -847,6 +867,7 @@
       }, 60000);
     }
     function clearWaiting() {
+      document.getElementById("reply-wait").hidden = true;
       waiting = false;
       clearTimeout(waitTimer);
     }
