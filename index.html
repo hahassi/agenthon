@@ -75,7 +75,7 @@
       display: flex; align-items: center; gap: 12px;
       font-weight: 800; font-size: 20px; letter-spacing: -0.02em;
     }
-    .brand svg { width: 28px; height: 28px; flex: none; }
+    .brand-logo { display: block; width: 28px; height: 28px; flex: none; }
     .nav { grid-column: 6 / span 7; display: flex; justify-content: flex-start; gap: 4px; }
     .nav a {
       padding: 8px 14px; font-size: 16px; font-weight: 600;
@@ -374,7 +374,7 @@
   <header>
     <div class="grid site-header">
       <a class="brand" href="#top" aria-label="조각연습실 처음으로">
-        <svg viewBox="0 0 28 28" aria-hidden="true"><path id="brand-mark" fill="#151515" d=""/></svg>
+        <img class="brand-logo" src="data:image/png;base64,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" width="28" height="28" alt="">
         조각연습실
       </a>
       <nav class="nav" aria-label="페이지 내 이동">
@@ -564,7 +564,6 @@
     const colorOf = (x, y, shift) => PALETTE[(x + 2 * y + (shift || 0)) % 4];
 
     // brand mark: one piece from a 2x2 set
-    document.getElementById("brand-mark").setAttribute("d", jigsaw(2, 2, 16, 3, 3)[0].d);
 
     // hero: 3x2 pieces assembling once
     const hero = document.getElementById("hero-svg");
