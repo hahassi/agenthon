@@ -581,7 +581,7 @@
 
     // hero: 3x2 pieces assembling once
     const hero = document.getElementById("hero-svg");
-    const heroColors = ["var(--lemon)", "var(--lavender)", "var(--paper)", "var(--mint)", "var(--lemon)", "var(--lavender)"];
+    const heroColors = ["#EDAE96", "#C7B2DF", "#A9D8ED", "#A9C9AD", "#E3BF83", "#DCAEC7"];
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!reduce) hero.classList.add("assemble");
     jigsaw(3, 2, 120).forEach((p, i) => {
