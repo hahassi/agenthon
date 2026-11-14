@@ -202,6 +202,26 @@
       .chat-body:has(.reply-wait:not([hidden])) #webchat .webchat__basic-transcript { margin-bottom: 68px; }
     }
 
+    .chat[data-view="welcome"] > :is(.chat-bar, .prompts, .chat-body) { display: none; }
+    .welcome {
+      flex: 1; min-height: 0; overflow: auto;
+      padding: clamp(20px, 3vw, 44px);
+      background: var(--bg);
+    }
+    .welcome h2 { font-size: clamp(28px, 3vw, 42px); margin-bottom: 12px; }
+    .welcome > p { max-width: 38em; }
+    .welcome-roles {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px; list-style: none; margin: 20px 0; padding: 0;
+    }
+    .welcome-roles li { padding: 12px; }
+    .welcome-roles strong { display: block; margin-bottom: 4px; }
+    .welcome-roles p { font-size: .875rem; }
+    .welcome .btn { margin-top: 20px; }
+    @media (max-width: 540px) {
+      .welcome-roles { grid-template-columns: 1fr; }
+    }
+
     .chat-body { position: relative; flex: 1; min-height: 0; display: flex; }
     #webchat { position: absolute; inset: 0; }
     .chat-loading, .chat-error {
@@ -436,9 +456,20 @@
         </div>
       </div>
 
-      <div class="chat" id="chat" role="region" aria-labelledby="chat-title">
+      <div class="chat" id="chat" data-view="welcome" role="region" aria-labelledby="welcome-title">
+        <section class="welcome" id="welcome" aria-labelledby="welcome-title">
+          <h2 id="welcome-title">어떻게 연습하나요?</h2>
+          <p>레퍼런스에서 눈에 들어온 요소 하나를 따라 만들고, 내 작업에 적용해 봐요.</p>
+          <ul class="welcome-roles">
+            <li class="c-lavender"><strong>관찰</strong><p>작품에서 볼 부분과 연습할 조각을 골라요.</p></li>
+            <li class="c-paper"><strong>실습</strong><p>쓰는 도구에 맞춰 한 단계씩 따라 만들어요.</p></li>
+            <li class="c-mint"><strong>기록</strong><p>바꾼 설정과 전후 결과를 정리해요.</p></li>
+          </ul>
+          <p>피그마, 포토샵, 일러스트레이터 중 쓰는 도구와 배우고 싶은 표현을 알려 주세요. 참고 이미지가 있으면 함께 올려도 좋아요.</p>
+          <button class="btn" id="start-chat" type="button">대화 시작하기</button>
+        </section>
         <div class="chat-bar">
-          <h2 id="chat-title" aria-label="조각연습실 대화"><span class="brand-logo" aria-hidden="true"></span></h2>
+          <h2 id="chat-title" tabindex="-1" aria-label="조각연습실 대화"><span class="brand-logo" aria-hidden="true"></span></h2>
           <span class="conn" id="conn" data-state="connecting">연결 중</span>
           <div class="chat-controls"><button class="btn btn--light" id="open-history" type="button">이전 대화</button><button class="btn btn--light" id="new-chat" type="button">새 대화</button></div>
         </div>
@@ -1078,7 +1109,20 @@
 
     document.getElementById("new-chat").addEventListener("click", connect);
     document.getElementById("retry").addEventListener("click", connect);
-    connect();
+    const chatPanel = document.getElementById("chat");
+    function openChat() {
+      if (chatPanel.dataset.view !== "welcome") return;
+      chatPanel.dataset.view = "chat";
+      document.getElementById("welcome").hidden = true;
+      chatPanel.setAttribute("aria-labelledby", "chat-title");
+      document.getElementById("chat-title").focus({ preventScroll: true });
+      connect();
+    }
+
+    document.getElementById("start-chat").addEventListener("click", openChat);
+    document.querySelectorAll('a[href="#chat"]').forEach(link => {
+      link.addEventListener("click", openChat);
+    });
   })();
   </script>
 </body>
