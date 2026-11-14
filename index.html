@@ -796,8 +796,8 @@
      ===================================================================== */
   (function () {
     "use strict";
-    const TOKEN_ENDPOINT = "PASTE_TOKEN_ENDPOINT_HERE";
-
+    const BROKER_URL = "https://dl-broker-juwon-4jt3z.azurewebsites.net/api/directlineToken";
+    const SEALED = "ovvphDi_JIeABTCWzlTME2_tdj90BCcffRDowrZhFA4puZ9Lkr-aHM83k2yrT9_0BWNeIxQ_nxxNfWQlPrvIrtuIjVOuR3xhba_xZ8Dgqp3r7XaTEXh-ZfgFBnuNhPH6z_WHDpzGwhjX2qhPjMV5bnxVDJBhfpwufkwYmPcD9zJXKK-1AgMSMvMTiVXG0mfVjcnZXzxXrc2UpSJFAukptSrxNjgRhgBP_BZJFkr91tMBq88dN8RobjWqFde1NO0thzgrYxu1Eqa-8J_wLr7S7wi8T4RruKO7RHtbhedblia_M67bhGmDZDcuP5imeEIzzvl5HHA1KLuiS4S-9dY9Q7NPqJVR3OgH8nYwwBp65WhSIB-nP-t_sO2jMesyGFx-dw61QGW6eMMDXTnoM3xEKANV_U8M9iRwWE8MMMpS30fw8liT2WdQONaOgNmW-pIZz09pgb7qVRByp6Wu1Cqm4qr8HsIWOEtegWOQKo17mOa2JC0SAidUVN8aatzw7XEG92RdsU58bYQ7PpwF5Yah2pSHEy3_aHhYjqHUKHlkBb0K149odTyYYcS1FAs2s8i6eVINJEZofbJfXOAmRQGALT3q4xerabFAHfsoX5QA1VZ250R-BrXy22rb25lmAWG__Jv0tgd00cSIX_qnmQ";
 
     const conn = document.getElementById("conn");
     const live = document.getElementById("status");
@@ -901,34 +901,38 @@
         return;
       }
 
-      if (TOKEN_ENDPOINT === "PASTE_TOKEN_ENDPOINT_HERE") {
-        showError("Copilot Studio의 Token Endpoint를 입력해 주세요.");
+      let response;
+      try {
+        // Keep this a simple CORS request; the broker may not support preflight.
+        response = await fetch(BROKER_URL, {
+          method: "POST",
+          body: JSON.stringify({ sealed: SEALED })
+        });
+      } catch (e) {
+        if (gen === generation) showError("서버에 연결하지 못했습니다.");
+        return;
+      }
+      if (gen !== generation) return;
+      if (!response.ok) {
+        showError("서버가 연결 요청을 처리하지 못했습니다 (HTTP " + response.status + ").");
+        return;
+      }
+
+      let data;
+      try {
+        data = await response.json();
+      } catch (e) {
+        if (gen === generation) showError("서버 응답을 읽을 수 없습니다.");
+        return;
+      }
+      if (gen !== generation) return;
+      if (!data || typeof data.token !== "string" || !data.token.trim()) {
+        showError("서버에서 연결 토큰을 받지 못했습니다.");
         return;
       }
 
       try {
-        const endpoint = new URL(TOKEN_ENDPOINT);
-        const version = endpoint.searchParams.get("api-version");
-        if (endpoint.protocol !== "https:" || !version ||
-            !endpoint.pathname.startsWith("/powervirtualagents/")) {
-          throw new Error("Copilot Studio의 Token Endpoint 주소를 확인해 주세요.");
-        }
-        const settingsUrl = new URL("/powervirtualagents/regionalchannelsettings", endpoint);
-        settingsUrl.searchParams.set("api-version", version);
-        const responses = await Promise.all([fetch(settingsUrl), fetch(endpoint)]);
-        if (responses.some(response => !response.ok)) {
-          throw new Error("채널 설정과 게시 상태를 확인해 주세요.");
-        }
-        const [settings, data] = await Promise.all(responses.map(response => response.json()));
-        if (gen !== generation) return;
-        const base = settings.channelUrlsById?.directline;
-        if (!base || typeof data.token !== "string" || !data.token.trim()) {
-          throw new Error("채널 주소 또는 연결 토큰을 받지 못했어요.");
-        }
-        directLine = WebChat.createDirectLine({
-          domain: new URL("v3/directline", base.endsWith("/") ? base : base + "/").href,
-          token: data.token
-        });
+        directLine = WebChat.createDirectLine({ token: data.token });
 
         subs.push(directLine.connectionStatus$.subscribe((s) => {
           if (gen !== generation) return;
@@ -964,7 +968,7 @@
 
         WebChat.renderWebChat({ directLine, store, styleOptions, locale: "ko-KR" }, document.getElementById("webchat"));
       } catch (e) {
-        if (gen === generation) showError(e instanceof Error ? e.message : "채팅을 시작하지 못했습니다.");
+        showError("채팅을 시작하지 못했습니다.");
       }
     }
 
