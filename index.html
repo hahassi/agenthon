@@ -184,11 +184,11 @@
     .prompt[aria-disabled="true"]:hover { background: var(--white); }
 
     .reply-wait {
-      position: absolute; left: 16px; right: 16px; bottom: 64px; z-index: 2;
-      width: fit-content; max-width: calc(100% - 32px);
+      position: absolute; inset-inline: 0; bottom: 56px; z-index: 2;
+      min-height: 44px;
       display: flex; align-items: center; gap: 10px;
       padding: 8px 12px; background: var(--paper-h); color: var(--ink);
-      border: 1px solid var(--lavender); font-size: .875rem;
+      border-top: 1px solid var(--lavender); font-size: .875rem;
       pointer-events: none;
     }
     .reply-spinner {
@@ -197,6 +197,10 @@
       animation: reply-spin .8s linear infinite;
     }
     @keyframes reply-spin { to { transform: rotate(360deg); } }
+    .chat-body:has(.reply-wait:not([hidden])) #webchat .webchat__basic-transcript { margin-bottom: 52px; }
+    @media (max-width: 480px) {
+      .chat-body:has(.reply-wait:not([hidden])) #webchat .webchat__basic-transcript { margin-bottom: 68px; }
+    }
 
     .chat-body { position: relative; flex: 1; min-height: 0; display: flex; }
     #webchat { position: absolute; inset: 0; }
